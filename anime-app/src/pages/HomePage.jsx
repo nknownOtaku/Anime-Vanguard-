@@ -20,23 +20,19 @@ function HomePage() {
     async function fetchData() {
       try {
         setLoading(true);
-        const [trending, topRated, seasonal, recent] = await Promise.all([
+        const [trending, topRated, seasonal, recent, popular, movies] = await Promise.all([
           fetchTrendingAnime(15),
           fetchTopRatedAnime(12),
           fetchSeasonalAnime(12),
-          fetchRecentAnime()
+          fetchRecentAnime(),
+          fetchTopRatedAnime(12, 'POPULARITY_DESC'),
+          fetchTrendingAnime(12, 'MOVIE')
         ]);
         setTrendingAnime(trending);
         setTopRatedAnime(topRated);
         setSeasonalAnime(seasonal);
         setRecentAnime(recent);
-
-        // Get popular (all time) from anilist
-        const popular = await fetchTopRatedAnime(12, 'POPULAR');
         setPopularAnime(popular);
-
-        // Get movies
-        const movies = await fetchTrendingAnime(12, 'MOVIE');
         setMoviesAnime(movies);
       } catch (error) {
         console.error('Error fetching anime:', error);
@@ -54,6 +50,20 @@ function HomePage() {
   const handleWatchNow = (id) => {
     navigate(`/info/${id}`);
   };
+
+  // Skeleton loader component
+  const SkeletonCard = () => (
+    <div className="anime-card-popular skeleton">
+      <div className="skeleton-image"></div>
+      <div className="skeleton-info">
+        <div className="skeleton-title"></div>
+        <div className="skeleton-meta">
+          <div className="skeleton-year"></div>
+          <div className="skeleton-rating"></div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="home-page">
@@ -105,88 +115,76 @@ function HomePage() {
       {/* Popular of all time Section */}
       <section className="content-section" id="popular">
         <h2 className="section-title">🏆 Popular of all time</h2>
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading popular anime...</p>
-          </div>
-        ) : (
-          <div className="anime-grid-popular">
-            {popularAnime.map(anime => (
-              <div key={anime.id} className="anime-card-popular" onClick={() => handleMoreInfo(anime.id, anime.title.english || anime.title.romaji)}>
-                <div className="card-badge-cc">CC</div>
-                <div className="card-badge-dub">DUB</div>
-                <div className="card-episodes">{anime.episodes || '?'}</div>
-                <img src={anime.coverImage.medium} alt={anime.title.romaji} />
-                <div className="card-info-popular">
-                  <h4>{anime.title.english || anime.title.romaji}</h4>
-                  <div className="card-meta-popular">
-                    <span className="year">{anime.seasonYear}</span>
-                    <span className="rating">⭐ {(anime.averageScore / 10).toFixed(1)}</span>
+        <div className="anime-grid-popular">
+          {loading 
+            ? Array(12).fill(0).map((_, i) => <SkeletonCard key={i} />)
+            : popularAnime.map(anime => (
+                <div key={anime.id} className="anime-card-popular" onClick={() => handleMoreInfo(anime.id, anime.title.english || anime.title.romaji)}>
+                  <div className="card-badge-cc">CC</div>
+                  <div className="card-badge-dub">DUB</div>
+                  <div className="card-episodes">{anime.episodes || '?'}</div>
+                  <img src={anime.coverImage.medium} alt={anime.title.romaji} />
+                  <div className="card-info-popular">
+                    <h4>{anime.title.english || anime.title.romaji}</h4>
+                    <div className="card-meta-popular">
+                      <span className="year">{anime.seasonYear}</span>
+                      <span className="rating">⭐ {(anime.averageScore / 10).toFixed(1)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))
+          }
+        </div>
       </section>
 
       {/* Ongoing Now Section */}
       <section className="content-section" id="ongoing">
         <h2 className="section-title">📺 Ongoing Now</h2>
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading ongoing anime...</p>
-          </div>
-        ) : (
-          <div className="anime-grid-popular">
-            {seasonalAnime.slice(0, 8).map(anime => (
-              <div key={anime.id} className="anime-card-popular" onClick={() => handleMoreInfo(anime.id, anime.title.english || anime.title.romaji)}>
-                <div className="card-badge-cc">CC</div>
-                <div className="card-badge-dub">DUB</div>
-                <div className="card-episodes">{anime.episodes || '?'}</div>
-                <img src={anime.coverImage.medium} alt={anime.title.romaji} />
-                <div className="card-info-popular">
-                  <h4>{anime.title.english || anime.title.romaji}</h4>
-                  <div className="card-meta-popular">
-                    <span className="year">{anime.seasonYear}</span>
-                    <span className="rating">⭐ {(anime.averageScore / 10).toFixed(1)}</span>
+        <div className="anime-grid-popular">
+          {loading 
+            ? Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />)
+            : seasonalAnime.slice(0, 8).map(anime => (
+                <div key={anime.id} className="anime-card-popular" onClick={() => handleMoreInfo(anime.id, anime.title.english || anime.title.romaji)}>
+                  <div className="card-badge-cc">CC</div>
+                  <div className="card-badge-dub">DUB</div>
+                  <div className="card-episodes">{anime.episodes || '?'}</div>
+                  <img src={anime.coverImage.medium} alt={anime.title.romaji} />
+                  <div className="card-info-popular">
+                    <h4>{anime.title.english || anime.title.romaji}</h4>
+                    <div className="card-meta-popular">
+                      <span className="year">{anime.seasonYear}</span>
+                      <span className="rating">⭐ {(anime.averageScore / 10).toFixed(1)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))
+          }
+        </div>
       </section>
 
       {/* Recent Uploads Section */}
       <section className="content-section" id="recent">
         <h2 className="section-title">🆕 Recent Uploads</h2>
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading recent uploads...</p>
-          </div>
-        ) : (
-          <div className="anime-grid-popular">
-            {recentAnime.map((anime, index) => (
-              <div key={`${anime.anime_id}-${index}`} className="anime-card-popular" onClick={() => handleMoreInfo(anime.anime_id, anime.anime_title)}>
-                <div className="card-badge-cc">CC</div>
-                {anime.fansub !== 'SubsPlease' && <div className="card-badge-dub">DUB</div>}
-                <div className="card-episodes">{anime.episode}</div>
-                <img src={anime.snapshot} alt={anime.anime_title} />
-                <div className="card-info-popular">
-                  <h4>{anime.anime_title}</h4>
-                  <div className="card-meta-popular">
-                    <span className="year">{new Date(anime.created_at).getFullYear()}</span>
-                    <span className="rating">⭐ {anime.fansub === 'Amazon' ? '8.0' : '7.5'}</span>
+        <div className="anime-grid-popular">
+          {loading 
+            ? Array(12).fill(0).map((_, i) => <SkeletonCard key={i} />)
+            : recentAnime.map((anime, index) => (
+                <div key={`${anime.anime_id}-${index}`} className="anime-card-popular" onClick={() => handleMoreInfo(anime.anime_id, anime.anime_title)}>
+                  <div className="card-badge-cc">CC</div>
+                  {anime.fansub !== 'SubsPlease' && <div className="card-badge-dub">DUB</div>}
+                  <div className="card-episodes">{anime.episode}</div>
+                  <img src={anime.snapshot} alt={anime.anime_title} />
+                  <div className="card-info-popular">
+                    <h4>{anime.anime_title}</h4>
+                    <div className="card-meta-popular">
+                      <span className="year">{new Date(anime.created_at).getFullYear()}</span>
+                      <span className="rating">⭐ {anime.fansub === 'Amazon' ? '8.0' : '7.5'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))
+          }
+        </div>
         <div className="load-more-container">
           <button className="btn-load-more">Load More Recent Uploads</button>
           <p className="view-all-text">View all recent anime additions</p>
@@ -196,56 +194,48 @@ function HomePage() {
       {/* Movies Spotlight Section */}
       <section className="content-section" id="movies">
         <h2 className="section-title">🎬 Movies Spotlight</h2>
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading movies...</p>
-          </div>
-        ) : (
-          <div className="anime-grid">
-            {moviesAnime.map(anime => (
-              <div key={anime.id} className="anime-card-simple" onClick={() => handleMoreInfo(anime.id, anime.title.english || anime.title.romaji)}>
-                <img src={anime.coverImage.medium} alt={anime.title.romaji} />
-                <div className="card-info-simple">
-                  <h4>{anime.title.english || anime.title.romaji}</h4>
-                  <div className="card-meta-simple">
-                    <span className="year">{anime.seasonYear}</span>
-                    <span className="rating">⭐ {(anime.averageScore / 10).toFixed(1)}</span>
+        <div className="anime-grid">
+          {loading 
+            ? Array(12).fill(0).map((_, i) => <SkeletonCard key={i} />)
+            : moviesAnime.map(anime => (
+                <div key={anime.id} className="anime-card-simple" onClick={() => handleMoreInfo(anime.id, anime.title.english || anime.title.romaji)}>
+                  <img src={anime.coverImage.medium} alt={anime.title.romaji} />
+                  <div className="card-info-simple">
+                    <h4>{anime.title.english || anime.title.romaji}</h4>
+                    <div className="card-meta-simple">
+                      <span className="year">{anime.seasonYear}</span>
+                      <span className="rating">⭐ {(anime.averageScore / 10).toFixed(1)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))
+          }
+        </div>
       </section>
 
       {/* Explore More Section */}
       <section className="content-section" id="explore">
         <h2 className="section-title">🔍 Explore More</h2>
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading more anime...</p>
-          </div>
-        ) : (
-          <div className="anime-grid-popular">
-            {[...topRatedAnime, ...seasonalAnime].slice(0, 24).map(anime => (
-              <div key={`explore-${anime.id}`} className="anime-card-popular" onClick={() => handleMoreInfo(anime.id, anime.title.english || anime.title.romaji)}>
-                <div className="card-badge-cc">CC</div>
-                <div className="card-badge-dub">DUB</div>
-                <div className="card-episodes">{anime.episodes || '?'}</div>
-                <img src={anime.coverImage.medium} alt={anime.title.romaji} />
-                <div className="card-info-popular">
-                  <h4>{anime.title.english || anime.title.romaji}</h4>
-                  <div className="card-meta-popular">
-                    <span className="year">{anime.seasonYear}</span>
-                    <span className="rating">⭐ {(anime.averageScore / 10).toFixed(1)}</span>
+        <div className="anime-grid-popular">
+          {loading 
+            ? Array(24).fill(0).map((_, i) => <SkeletonCard key={i} />)
+            : [...topRatedAnime, ...seasonalAnime].slice(0, 24).map(anime => (
+                <div key={`explore-${anime.id}`} className="anime-card-popular" onClick={() => handleMoreInfo(anime.id, anime.title.english || anime.title.romaji)}>
+                  <div className="card-badge-cc">CC</div>
+                  <div className="card-badge-dub">DUB</div>
+                  <div className="card-episodes">{anime.episodes || '?'}</div>
+                  <img src={anime.coverImage.medium} alt={anime.title.romaji} />
+                  <div className="card-info-popular">
+                    <h4>{anime.title.english || anime.title.romaji}</h4>
+                    <div className="card-meta-popular">
+                      <span className="year">{anime.seasonYear}</span>
+                      <span className="rating">⭐ {(anime.averageScore / 10).toFixed(1)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))
+          }
+        </div>
       </section>
 
       <Footer />
