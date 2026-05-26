@@ -1,17 +1,19 @@
 .header {
-  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 1000;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .header-container {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -133,11 +135,9 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-}
-
-.search-btn-header:hover {
-  color: #667eea;
-  transform: scale(1.1);
+  visibility: hidden;
+  width: 0;
+  padding: 0;
 }
 
 .search-btn {
