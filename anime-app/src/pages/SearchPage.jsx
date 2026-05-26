@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SearchPage.css';
 import { searchAnime } from '../api/anilist';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 function SearchPage() {
   const [query, setQuery] = useState('');
@@ -42,6 +44,8 @@ function SearchPage() {
 
   return (
     <div className="search-page">
+      <Header />
+      
       <div className="search-header">
         <h1>🔍 Search Anime</h1>
         <p>Find your favorite anime titles</p>
@@ -93,8 +97,8 @@ function SearchPage() {
             <p className="results-count">{results.length} results found</p>
             <div className="results-grid">
               {results.map(anime => (
-                <div 
-                  key={anime.id} 
+                <div
+                  key={anime.id}
                   className="result-card"
                   onClick={() => handleCardClick(anime.id)}
                 >
@@ -121,6 +125,8 @@ function SearchPage() {
           </>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

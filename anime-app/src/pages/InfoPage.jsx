@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './InfoPage.css';
 import { fetchAnimeDetails } from '../api/anilist';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 function InfoPage() {
   const { id } = useParams();
@@ -29,7 +31,12 @@ function InfoPage() {
   if (loading) {
     return (
       <div className="info-page">
-        <div className="loading">Loading...</div>
+        <Header />
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading anime details...</p>
+        </div>
+        <Footer />
       </div>
     );
   }
@@ -37,13 +44,21 @@ function InfoPage() {
   if (error || !anime) {
     return (
       <div className="info-page">
-        <div className="error">Error: {error || 'Anime not found'}</div>
+        <Header />
+        <div className="error-container">
+          <h2>Error</h2>
+          <p>{error || 'Anime not found'}</p>
+          <button onClick={() => navigate('/')} className="btn-back">← Back to Home</button>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="info-page">
+      <Header />
+      
       {/* Hero Banner */}
       <div className="info-hero" style={{ backgroundImage: `url(${anime.bannerImage || anime.coverImage.large})` }}>
         <div className="info-hero-overlay">
@@ -53,7 +68,7 @@ function InfoPage() {
           <div className="info-details">
             <h1>{anime.title.english || anime.title.romaji}</h1>
             <p className="native-title">{anime.title.native}</p>
-            
+
             <div className="info-meta">
               <span className="meta-item">📅 {anime.seasonYear}</span>
               <span className="meta-item">⭐ {anime.averageScore / 10}</span>
@@ -131,8 +146,8 @@ function InfoPage() {
             <h2>🔗 Related Anime</h2>
             <div className="relations-grid">
               {anime.relations.slice(0, 6).map(relation => (
-                <div 
-                  key={relation.id} 
+                <div
+                  key={relation.id}
                   className="relation-card"
                   onClick={() => navigate(`/info/${relation.id}`)}
                 >
@@ -190,6 +205,8 @@ function InfoPage() {
           </div>
         </section>
       </div>
+
+      <Footer />
     </div>
   );
 }
