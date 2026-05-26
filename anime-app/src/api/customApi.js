@@ -1,6 +1,26 @@
 // Custom API configuration
-// Replace with your actual custom API endpoint
-const CUSTOM_API_BASE_URL = import.meta.env.VITE_CUSTOM_API_URL || 'http://localhost:3001/api';
+const CUSTOM_API_BASE_URL = 'https://animepahe-scrapper.otakusyndicate.workers.dev/animepahe';
+
+/**
+ * Fetch recent anime from animepahe API
+ * @returns {Promise<Array>} - Array of recent anime data
+ */
+export async function fetchRecentAnime() {
+  try {
+    const response = await fetch(`${CUSTOM_API_BASE_URL}?action=airing`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error('Error fetching recent anime:', error);
+    // Return empty array on error
+    return [];
+  }
+}
 
 /**
  * Fetch featured anime from custom API
