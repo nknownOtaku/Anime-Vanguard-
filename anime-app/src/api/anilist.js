@@ -4,13 +4,14 @@ const ANILIST_API_URL = 'https://graphql.anilist.co';
 /**
  * Fetch trending anime from Anilist API
  * @param {number} limit - Number of anime to fetch (default: 10)
+ * @param {string} format - Format filter (optional, e.g., 'MOVIE', 'TV')
  * @returns {Promise<Array>} - Array of anime data
  */
-export async function fetchTrendingAnime(limit = 10) {
+export async function fetchTrendingAnime(limit = 10, format = null) {
   const query = `
-    query ($page: Int, $perPage: Int) {
+    query ($page: Int, $perPage: Int, $format: MediaFormat) {
       Page(page: $page, perPage: $perPage) {
-        media(sort: TRENDING_DESC, type: ANIME) {
+        media(sort: TRENDING_DESC, type: ANIME, format: $format) {
           id
           title {
             romaji
@@ -43,6 +44,7 @@ export async function fetchTrendingAnime(limit = 10) {
   const variables = {
     page: 1,
     perPage: limit,
+    format: format,
   };
 
   try {
@@ -73,13 +75,14 @@ export async function fetchTrendingAnime(limit = 10) {
 /**
  * Fetch top rated anime from Anilist API
  * @param {number} limit - Number of anime to fetch
+ * @param {string} sort - Sort type (SCORE_DESC or POPULARITY_DESC)
  * @returns {Promise<Array>} - Array of anime data
  */
-export async function fetchTopRatedAnime(limit = 10) {
+export async function fetchTopRatedAnime(limit = 10, sort = 'SCORE_DESC') {
   const query = `
-    query ($page: Int, $perPage: Int) {
+    query ($page: Int, $perPage: Int, $sort: [MediaSort]) {
       Page(page: $page, perPage: $perPage) {
-        media(type: ANIME, sort: SCORE_DESC, status_not_in: CANCELLED) {
+        media(type: ANIME, sort: $sort, status_not_in: CANCELLED) {
           id
           title {
             romaji
@@ -107,6 +110,7 @@ export async function fetchTopRatedAnime(limit = 10) {
   const variables = {
     page: 1,
     perPage: limit,
+    sort: sort,
   };
 
   try {

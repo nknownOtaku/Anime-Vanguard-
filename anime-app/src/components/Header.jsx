@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Header.css';
 
 /**
@@ -6,6 +6,15 @@ import './Header.css';
  */
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const query = e.target.querySelector('input').value;
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    }
+  };
 
   return (
     <header className="header">
@@ -14,30 +23,37 @@ function Header() {
           <span className="logo-icon">🎌</span>
           <h1 className="logo-text">Anime Vanguard</h1>
         </div>
+        
+        <form className="search-form" onSubmit={handleSearch}>
+          <input
+            type="text"
+            placeholder="Search anime, movies, series..."
+            className="search-input"
+          />
+          <button type="submit" className="search-btn-header">
+            🔍
+          </button>
+        </form>
+
         <nav className="header-nav">
           <ul className="nav-list">
             <li className="nav-item">
               <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Home</Link>
             </li>
             <li className="nav-item">
-              <Link to="/search" className={`nav-link ${location.pathname === '/search' ? 'active' : ''}`}>Search</Link>
+              <Link to="/search?status=completed" className={`nav-link ${location.pathname === '/search' && location.search.includes('completed') ? 'active' : ''}`}>Completed</Link>
             </li>
             <li className="nav-item">
-              <a href="#trending" className="nav-link">Trending</a>
+              <Link to="/search?status=ongoing" className={`nav-link ${location.pathname === '/search' && location.search.includes('ongoing') ? 'active' : ''}`}>Ongoing</Link>
             </li>
             <li className="nav-item">
-              <a href="#top-rated" className="nav-link">Top Rated</a>
+              <Link to="/search?sort=schedule" className={`nav-link ${location.pathname === '/search' && location.search.includes('schedule') ? 'active' : ''}`}>Schedule</Link>
             </li>
             <li className="nav-item">
-              <a href="#seasonal" className="nav-link">Seasonal</a>
+              <Link to="/search?sort=recent" className={`nav-link ${location.pathname === '/search' && location.search.includes('recent') ? 'active' : ''}`}>Recent</Link>
             </li>
           </ul>
         </nav>
-        <div className="header-actions">
-          <Link to="/search" className="search-btn" aria-label="Search">
-            🔍
-          </Link>
-        </div>
       </div>
     </header>
   );
