@@ -1,212 +1,361 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import './InfoPage.css';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { fetchAnimeDetails } from '../api/anilist';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
+import './InfoPage.css';
 
 function InfoPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [anime, setAnime] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchDetails() {
+    const loadAnime = async () => {
       try {
         setLoading(true);
         const data = await fetchAnimeDetails(id);
         setAnime(data);
         setError(null);
       } catch (err) {
-        setError(err.message);
+        console.error('Failed to fetch anime details:', err);
+        setError('Failed to load anime information. Please try again later.');
       } finally {
         setLoading(false);
       }
-    }
-    fetchDetails();
+    };
+
+    if (id) loadAnime();
   }, [id]);
+
+  /* =========================
+     YOUTUBE HELPER
+  ========================= */
+  const getYouTubeId = (trailer) => {
+    if (!trailer || trailer.site !== 'youtube') return null;
+    return trailer.id;
+  };
 
   if (loading) {
     return (
-      <div className="info-page">
+      <div className="info-page-loading">
         <Header />
-        <div className="loading-container">
+        <div className="loading-spinner">
           <div className="spinner"></div>
-          <p>Loading anime details...</p>
+          <p>Loading Anime Details...</p>
         </div>
-        <Footer />
       </div>
     );
   }
 
   if (error || !anime) {
     return (
-      <div className="info-page">
+      <div className="info-page-error">
         <Header />
         <div className="error-container">
-          <h2>Error</h2>
-          <p>{error || 'Anime not found'}</p>
-          <button onClick={() => navigate('/')} className="btn-back">← Back to Home</button>
+          <h2>Oops!</h2>
+          <p>{error || 'Anime not found.'}</p>
+          <Link to="/" className="back-btn">← Back to Home</Link>
         </div>
-        <Footer />
       </div>
     );
   }
 
+  /* =========================
+     DATA NORMALIZATION
+  ========================= */
+
+  const title =
+    anime.title?.english ||
+    anime.title?.romaji ||
+    anime.title?.native ||
+    'Unknown Title';
+
+  const encodedTitle = encodeURIComponent(title);
+
+  const bannerImage =
+    anime.bannerImage ||
+    anime.coverImage?.extraLarge;
+
+  const posterImage =
+    anime.coverImage?.extraLarge ||
+    anime.coverImage?.large;
+
+  const description = anime.description
+    ? anime.description
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]*>/g, '')
+    : 'No description available.';
+
+  const youtubeId = getYouTubeId(anime.trailer);
+
+  /* =========================
+     UI
+  ========================= */
+
   return (
-    <div className="info-page">
+    <div className="info-page-wrapper">
       <Header />
-      
-      {/* Hero Banner */}
-      <div className="info-hero" style={{ backgroundImage: `url(${anime.bannerImage || anime.coverImage.large})` }}>
-        <div className="info-hero-overlay">
-          <div className="info-poster">
-            <img src={anime.coverImage.large} alt={anime.title.romaji} />
-          </div>
-          <div className="info-details">
-            <h1>{anime.title.english || anime.title.romaji}</h1>
-            <p className="native-title">{anime.title.native}</p>
 
-            <div className="info-meta">
-              <span className="meta-item">📅 {anime.seasonYear}</span>
-              <span className="meta-item">⭐ {anime.averageScore / 10}</span>
-              <span className="meta-item">📺 {anime.format}</span>
-              <span className="meta-item">🎬 {anime.episodes || '?'} Episodes</span>
-              <span className="meta-item">⏱️ {anime.duration || '?'} min/ep</span>
+      <main className="info-content">
+
+        {/* HERO */}
+        <section className="info-hero">
+          {bannerImage && (
+            <div className="hero-banner">
+              <img
+                src={bannerImage}
+                alt={`${title} banner`}
+                className="banner-img"
+              />
+              <div className="banner-overlay"></div>
             </div>
+          )}
 
-            <div className="info-genres">
-              {anime.genres.map(genre => (
-                <span key={genre} className="genre-badge">{genre}</span>
-              ))}
-            </div>
+          <div className="hero-details">
+            <img
+              src={posterImage}
+              alt={title}
+              className="hero-poster"
+            />
 
-            <div className="info-status">
-              <span className={`status ${anime.status.toLowerCase()}`}>
-                {anime.status}
-              </span>
-            </div>
+            <div className="hero-text">
+              <h1 className="anime-title">{title}</h1>
 
-            <div className="info-actions">
-              <button className="btn-watch" onClick={() => alert('Streaming feature coming soon!')}>
-                ▶ Watch Now
-              </button>
-              <button className="btn-download" onClick={() => alert('Download feature coming soon!')}>
-                ⬇ Download
-              </button>
-              <button className="btn-favorite" onClick={() => alert('Added to favorites!')}>
-                ♥ Favorite
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+              <div className="anime-meta">
+                {anime.format && (
+                  <span className="meta-badge">
+                    {anime.format}
+                  </span>
+                )}
 
-      {/* Content Sections */}
-      <div className="info-content">
-        {/* Synopsis */}
-        <section className="info-section">
-          <h2>📖 Synopsis</h2>
-          <p className="synopsis">{anime.description?.replace(/<[^>]*>/g, '') || 'No synopsis available.'}</p>
-        </section>
+                {anime.status && (
+                  <span className="meta-badge status">
+                    {anime.status}
+                  </span>
+                )}
 
-        {/* Characters */}
-        {anime.characters && anime.characters.length > 0 && (
-          <section className="info-section">
-            <h2>👥 Main Characters</h2>
-            <div className="characters-grid">
-              {anime.characters.slice(0, 6).map(character => (
-                <div key={character.id} className="character-card">
-                  <img src={character.image.large} alt={character.name.full} />
-                  <p className="character-name">{character.name.full}</p>
-                  <p className="character-role">{character.role}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+                {anime.seasonYear && (
+                  <span className="meta-badge">
+                    {anime.seasonYear}
+                  </span>
+                )}
 
-        {/* Studios */}
-        {anime.studios && anime.studios.length > 0 && (
-          <section className="info-section">
-            <h2>🎬 Studios</h2>
-            <div className="studios-list">
-              {anime.studios.map(studio => (
-                <span key={studio.id} className="studio-tag">{studio.name}</span>
-              ))}
-            </div>
-          </section>
-        )}
+                {anime.episodes && (
+                  <span className="meta-badge">
+                    {anime.episodes} eps
+                  </span>
+                )}
 
-        {/* Relations */}
-        {anime.relations && anime.relations.length > 0 && (
-          <section className="info-section">
-            <h2>🔗 Related Anime</h2>
-            <div className="relations-grid">
-              {anime.relations.slice(0, 6).map(relation => (
-                <div
-                  key={relation.id}
-                  className="relation-card"
-                  onClick={() => navigate(`/info/${relation.id}`)}
+                {anime.averageScore && (
+                  <span className="meta-badge score">
+                    ⭐ {(anime.averageScore / 10).toFixed(1)}
+                  </span>
+                )}
+              </div>
+
+              <div className="anime-genres">
+                {anime.genres?.map((g) => (
+                  <span key={g} className="genre-pill">
+                    {g}
+                  </span>
+                ))}
+              </div>
+
+              {/* ACTIONS */}
+              <div className="anime-actions">
+
+                <Link
+                  to={`/watch/${encodedTitle}`}
+                  className="action-btn primary"
                 >
-                  <img src={relation.coverImage.medium} alt={relation.title.romaji} />
-                  <p className="relation-title">{relation.title.english || relation.title.romaji}</p>
-                  <span className="relation-type">{relation.relationType}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+                  ▶ Watch Now
+                </Link>
 
-        {/* Trailers */}
-        {anime.trailer && (
-          <section className="info-section">
-            <h2>🎬 Trailer</h2>
-            <div className="trailer-container">
-              {anime.trailer.site === 'YouTube' ? (
-                <iframe
-                  src={`https://www.youtube.com/embed/${anime.trailer.id}`}
-                  title="Anime Trailer"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              ) : (
-                <a href={anime.trailer.url} target="_blank" rel="noopener noreferrer" className="trailer-link">
-                  Watch Trailer on {anime.trailer.site}
-                </a>
-              )}
-            </div>
-          </section>
-        )}
+                <Link 
+                  to={`/watch/${encodedTitle}`} 
+                  className="action-btn secondary"
+                >
+                  ⬇ Download
+                </Link>
 
-        {/* Stats */}
-        <section className="info-section">
-          <h2>📊 Statistics</h2>
-          <div className="stats-grid">
-            <div className="stat-item">
-              <span className="stat-value">{anime.popularity.toLocaleString()}</span>
-              <span className="stat-label">Popularity</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-value">{anime.favourites.toLocaleString()}</span>
-              <span className="stat-label">Favorites</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-value">{anime.trending}</span>
-              <span className="stat-label">Trending Rank</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-value">{anime.rank || 'N/A'}</span>
-              <span className="stat-label">Overall Rank</span>
+              </div>
             </div>
           </div>
         </section>
-      </div>
 
-      <Footer />
+        {/* GRID */}
+        <div className="info-grid">
+
+          {/* LEFT */}
+          <div className="info-main">
+
+            {/* SYNOPSIS */}
+            <section className="info-section">
+              <h3 className="section-header">Synopsis</h3>
+              <p className="synopsis-text">{description}</p>
+            </section>
+
+            {/* TRAILER */}
+            {youtubeId && (
+              <section className="info-section">
+                <h3 className="section-header">Trailer</h3>
+
+                <div className="trailer-container">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${youtubeId}`}
+                    title="Trailer"
+                    frameBorder="0"
+                    allowFullScreen
+                  />
+                </div>
+              </section>
+            )}
+
+            {/* CHARACTERS */}
+            {anime.characters?.edges?.length > 0 && (
+              <section className="info-section">
+                <h3 className="section-header">Characters</h3>
+
+                <div className="characters-grid">
+                  {anime.characters.edges
+                    .slice(0, 6)
+                    .map((char, i) => (
+                      <div key={i} className="character-card">
+                        <img
+                          src={
+                            char.node.image?.large ||
+                            char.node.image?.medium
+                          }
+                          alt={char.node.name.full}
+                          className="char-image"
+                        />
+
+                        <p className="char-name">
+                          {char.node.name.full}
+                        </p>
+
+                        <p className="char-role">
+                          {char.role}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </section>
+            )}
+
+            {/* RECOMMENDATIONS */}
+            {anime.recommendations?.length > 0 && (
+              <section className="info-section">
+                <h3 className="section-header">
+                  Recommendations
+                </h3>
+
+                <div className="characters-grid">
+                  {anime.recommendations
+                    .slice(0, 6)
+                    .map((rec, i) => (
+                      <Link
+                        key={i}
+                        to={`/watch/${encodeURIComponent(rec.title)}`}
+                        className="character-card"
+                      >
+                        <img
+                          src={rec.image}
+                          className="char-image"
+                          alt={rec.title}
+                        />
+
+                        <p className="char-name">
+                          {rec.title}
+                        </p>
+
+                        <p className="char-role">
+                          {rec.type}
+                        </p>
+                      </Link>
+                    ))}
+                </div>
+              </section>
+            )}
+
+            {/* RELATIONS */}
+            {anime.relations?.edges?.length > 0 && (
+              <section className="info-section">
+                <h3 className="section-header">
+                  Related Anime
+                </h3>
+
+                <div className="characters-grid">
+                  {anime.relations.edges.map((rel, i) => (
+                    <Link
+                      key={i}
+                      to={`/info/${rel.node.id}`}
+                      className="character-card"
+                    >
+                      <img
+                        src={rel.node.coverImage?.large}
+                        className="char-image"
+                        alt={rel.node.title.romaji}
+                      />
+
+                      <p className="char-name">
+                        {rel.node.title.english ||
+                          rel.node.title.romaji}
+                      </p>
+
+                      <p className="char-role">
+                        {rel.relationType}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
+          </div>
+
+          {/* RIGHT SIDEBAR */}
+          <aside className="info-sidebar">
+
+            <div className="sidebar-card">
+              <h3 className="sidebar-title">
+                Information
+              </h3>
+
+              <div className="info-row">
+                <span className="label">Format</span>
+                <span className="value">
+                  {anime.format || 'N/A'}
+                </span>
+              </div>
+
+              <div className="info-row">
+                <span className="label">Episodes</span>
+                <span className="value">
+                  {anime.episodes || '?'}
+                </span>
+              </div>
+
+              <div className="info-row">
+                <span className="label">Status</span>
+                <span className="value">
+                  {anime.status || 'N/A'}
+                </span>
+              </div>
+
+              <div className="info-row">
+                <span className="label">Season</span>
+                <span className="value">
+                  {anime.season} {anime.seasonYear}
+                </span>
+              </div>
+            </div>
+
+          </aside>
+
+        </div>
+      </main>
     </div>
   );
 }

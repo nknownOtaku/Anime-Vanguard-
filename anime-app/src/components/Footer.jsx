@@ -11,10 +11,9 @@ function Footer() {
       <div className="footer-container">
         <div className="footer-main">
           <div className="footer-brand">
-            <span className="footer-logo-icon">🎌</span>
-            <h3 className="footer-logo-text">Anime Hub</h3>
+            <h3 className="footer-logo-text">Anime Vanguard</h3>
             <p className="footer-tagline">
-              Your ultimate destination for discovering and tracking anime series.
+              Your ultimate destination for streaming and downloading anime series.
             </p>
           </div>
 
@@ -52,14 +51,11 @@ function Footer() {
         </div>
 
         <div className="footer-bottom">
+          <p className="disclaimer">
+            Disclaimer: This site does not store any files on its server. All contents are provided by non-affiliated third parties.
+          </p>
           <p className="footer-copyright">
             © {currentYear} Anime Hub. All rights reserved.
-          </p>
-          <p className="footer-attribution">
-            Anime data provided by{' '}
-            <a href="https://anilist.co" target="_blank" rel="noopener noreferrer">
-              AniList API
-            </a>
           </p>
         </div>
       </div>

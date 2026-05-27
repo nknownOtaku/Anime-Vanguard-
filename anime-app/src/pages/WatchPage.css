@@ -1,0 +1,441 @@
+.watch-page {
+  min-height: 100vh;
+  background: #07090d;
+  color: white;
+}
+
+/* LOADING */
+
+.watch-loading-page,
+.watch-error-page {
+  min-height: 100vh;
+  background: #07090d;
+  color: white;
+}
+
+.watch-loader,
+.watch-error-box {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top: 4px solid #ff0055;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.watch-back-btn {
+  background: #ff0055;
+  padding: 12px 20px;
+  border-radius: 10px;
+  color: white;
+  text-decoration: none;
+}
+
+/* HERO */
+
+.watch-hero {
+  position: relative;
+  height: 620px;
+  overflow: hidden;
+}
+
+.watch-banner {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.watch-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, #07090d 5%, transparent 40%),
+    linear-gradient(to right, rgba(7,9,13,0.95), rgba(7,9,13,0.4));
+}
+
+.watch-hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 2rem;
+
+  padding: 120px 60px 50px;
+}
+
+.watch-poster {
+  width: 250px;
+  border-radius: 20px;
+  object-fit: cover;
+
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+.watch-info {
+  max-width: 850px;
+}
+
+.watch-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.watch-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.watch-badges span {
+  background: rgba(255,255,255,0.1);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+}
+
+.watch-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 1.5rem;
+}
+
+.watch-genres span {
+  background: rgba(255,0,85,0.12);
+  border: 1px solid rgba(255,0,85,0.4);
+  color: #ff4d88;
+
+  padding: 7px 14px;
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+}
+
+.watch-description {
+  line-height: 1.8;
+  color: #d0d0d0;
+  margin-bottom: 2rem;
+  max-width: 900px;
+}
+
+.watch-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.watch-btn {
+  text-decoration: none;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: 0.25s ease;
+}
+
+.watch-btn.primary {
+  background: #ff0055;
+  color: white;
+}
+
+.watch-btn.primary:hover {
+  transform: translateY(-2px);
+  background: #e0004b;
+}
+
+.watch-btn.secondary {
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+.watch-btn.secondary:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* CONTENT */
+
+.watch-content {
+  padding: 40px 60px 80px;
+}
+
+.section-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1.5rem;
+}
+
+.section-top h2 {
+  font-size: 2rem;
+}
+
+.section-top span {
+  color: #aaa;
+}
+
+/* EPISODES */
+
+.episodes-section {
+  margin-bottom: 4rem;
+}
+
+.episodes-scroll {
+  display: flex;
+  gap: 1.2rem;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding-bottom: 10px;
+
+  scroll-behavior: smooth;
+}
+
+.episodes-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.episodes-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+}
+
+.episode-card {
+  position: relative;
+  min-width: 300px;
+  height: 180px;
+
+  border-radius: 18px;
+  overflow: hidden;
+
+  text-decoration: none;
+  color: white;
+
+  flex-shrink: 0;
+
+  transition: 0.3s ease;
+}
+
+.episode-card:hover {
+  transform: translateY(-6px) scale(1.02);
+}
+
+.episode-card.active {
+  outline: 2px solid #ff0055;
+}
+
+.episode-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.episode-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+}
+
+.episode-details {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  padding: 1rem;
+  width: 100%;
+}
+
+.episode-details h3 {
+  margin-bottom: 0.3rem;
+}
+
+.episode-details p {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.filler-tag {
+  display: inline-block;
+  margin-top: 0.5rem;
+
+  background: #ff9800;
+  color: black;
+
+  padding: 4px 8px;
+  border-radius: 8px;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* RECOMMENDATIONS */
+
+.recommendations-grid {
+  display: grid;
+  width: 25%;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  height: 1000px;
+}
+
+.recommend-card {
+  background: #11151c;
+  border-radius: 18px;
+  overflow: hidden;
+
+  text-decoration: none;
+  color: white;
+
+  transition: 0.3s ease;
+}
+
+.recommend-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.24);
+}
+
+.recommend-card img {
+  width: 100%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.recommend-info {
+  padding: 1rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.recommend-info h3 {
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+
+.recommend-info span,
+.relation-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ff4d88;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.related-card .relation-label {
+  background: rgba(255, 0, 85, 0.16);
+  color: #ff7ab0;
+}
+
+.recommend-section {
+  margin-top: 3rem;
+}
+
+.recommend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.2rem;
+}
+
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.2rem;
+}
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+  .watch-hero {
+    height: auto;
+  }
+
+  .watch-hero-content {
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    padding: 120px 20px 40px;
+  }
+
+  .watch-overlay {
+    background:
+      linear-gradient(to top, #07090d 15%, rgba(7,9,13,0.5));
+  }
+
+  .watch-poster {
+    width: 180px;
+  }
+
+  .watch-title {
+    font-size: 2rem;
+  }
+
+  .watch-badges,
+  .watch-genres,
+  .watch-buttons {
+    justify-content: center;
+  }
+
+  .watch-content {
+    padding: 25px 20px 60px;
+  }
+
+  .episode-card {
+    min-width: 250px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 500px) {
+  .watch-title {
+    font-size: 1.7rem;
+  }
+
+  .watch-description {
+    font-size: 0.95rem;
+  }
+
+  .episode-card {
+    min-width: 220px;
+    height: 135px;
+  }
+
+  .recommendations-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .recommend-card img {
+    height: 220px;
+  }
+}

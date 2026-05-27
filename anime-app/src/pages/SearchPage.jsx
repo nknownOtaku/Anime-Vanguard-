@@ -79,19 +79,7 @@ function SearchPage() {
             <p>Try searching with different keywords</p>
           </div>
         )}
-
-        {!loading && !searched && (
-          <div className="search-tips">
-            <h2>💡 Search Tips</h2>
-            <ul>
-              <li>Search by anime title in English, Japanese, or Romaji</li>
-              <li>Type at least 2 characters to start searching</li>
-              <li>Results update automatically as you type</li>
-              <li>Click on any anime to view detailed information</li>
-            </ul>
-          </div>
-        )}
-
+        
         {!loading && searched && results.length > 0 && (
           <>
             <p className="results-count">{results.length} results found</p>

@@ -1,58 +1,47 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import './Header.css';
 
-/**
- * Header component with navigation and branding
- */
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const query = e.target.querySelector('input').value;
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
     }
   };
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <header className="header">
       <div className="header-container">
-        <div className="header-logo">
-          <span className="logo-icon">🎌</span>
-          <h1 className="logo-text">Anime Vanguard</h1>
-        </div>
-        
-        <form className="search-form" onSubmit={handleSearch}>
+        <Link to="/" className="logo">
+          <span className="logo-text">Anime Vanguard</span>
+        </Link>
+
+        <form onSubmit={handleSearch} className="search-form">
           <input
             type="text"
             placeholder="Search anime, movies, series..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
           />
-          <button type="submit" className="search-btn-header">
-            🔍
-          </button>
+          {/* Icon removed as requested */}
+          <button type="submit" className="search-btn-hidden" aria-label="Search"></button>
         </form>
 
-        <nav className="header-nav">
-          <ul className="nav-list">
-            <li className="nav-item">
-              <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Home</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/search?status=completed" className={`nav-link ${location.pathname === '/search' && location.search.includes('completed') ? 'active' : ''}`}>Completed</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/search?status=ongoing" className={`nav-link ${location.pathname === '/search' && location.search.includes('ongoing') ? 'active' : ''}`}>Ongoing</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/search?sort=schedule" className={`nav-link ${location.pathname === '/search' && location.search.includes('schedule') ? 'active' : ''}`}>Schedule</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/search?sort=recent" className={`nav-link ${location.pathname === '/search' && location.search.includes('recent') ? 'active' : ''}`}>Recent</Link>
-            </li>
-          </ul>
+        <nav className="nav-links">
+          <Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link>
+          <Link to="/completed" className={isActive('/completed') ? 'active' : ''}>Completed</Link>
+          <Link to="/ongoing" className={isActive('/ongoing') ? 'active' : ''}>Ongoing</Link>
+          <Link to="/schedule" className={isActive('/schedule') ? 'active' : ''}>Schedule</Link>
+          <Link to="/recent" className={isActive('/recent') ? 'active' : ''}>Recent</Link>
         </nav>
       </div>
     </header>
